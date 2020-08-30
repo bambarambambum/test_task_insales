@@ -14,7 +14,7 @@
 * - public_key_path - Путь до публичного ключа
 * - private_key_path - Путь до приватного ключа
 * - source_ranges - Один или пул IP адресов для доступа к 22 порту
-* variables.tf - Описание переменных
+* variables.tf - Описание переменных  
 ```Выбор Ubuntu 16.04 обусловлен тем, что для работы роли mongodb с python3 необходим pip3 и модуль ConfigParser, который в pip3 был переименован в configparser (я пробовал сначала все поднять на 18.04 (не хотелось затягивать с решением))```  
 
 ## Ansible
@@ -27,13 +27,13 @@
 * hosts_vars - Переменные хостов
 
 ## Запуск
-1. В папке terraform проводим инициализацию (на примере GCP, необходимо сделать gcloud auth application-default login либо предоставить credentials Terraform'y)
+1. В папке terraform проводим инициализацию (на примере GCP, необходимо сделать gcloud auth application-default login либо предоставить credentials Terraform'y)  
 ```terraform init```
-2. Запускаем
+2. Запускаем  
 ```terraform apply -auto-approve```
-3. В папке ansible скачиваем роли
+3. В папке ansible скачиваем роли  
 ```ansible-galaxy install -r requirements.yml```
-4. Запускаем
+4. Запускаем  
 ```ansible-playbook tasks/main.yml```
 
 ## Пруфы
