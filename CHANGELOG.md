@@ -1,3 +1,6 @@
+### v1
+* Описан репозиторий в README.md
+
 ### Terraform - v1
 * Убрана переменная "mongo_default_port"
 * Убрано правило для mongo в main.tf
