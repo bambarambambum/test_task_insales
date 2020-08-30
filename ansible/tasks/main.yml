@@ -1,0 +1,36 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: false
+  pre_tasks:
+    - name: Bootsrap Python for Ansible
+      raw: bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qqy python-minimal)"
+      register: output
+      changed_when: output.stdout != ""
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    - name: Add an Apt signing key
+      apt_key:
+        url: https://www.mongodb.org/static/pgp/server-4.2.asc
+        state: present
+    - name: Gathering Facts
+      setup:
+  roles:
+    - ufw
+
+- hosts: mongo
+  become: true
+  gather_facts: yes
+  roles:
+    - role: mongodb
+      when: "'mongo_master' in group_names"
+
+- hosts: mongo
+  become: true
+  gather_facts: yes
+  roles:
+    - role: mongodb
+      when: "'mongo_replicas' in group_names"

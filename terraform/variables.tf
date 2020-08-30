@@ -19,7 +19,7 @@ variable private_key_path {
 
 variable disk_image {
   description = "Disk image for mongo"
-  default     = "ubuntu-1804-lts"
+  default     = "ubuntu-1604-lts"
 }
 variable "machine_type" {
   description = "Standart machine type"
