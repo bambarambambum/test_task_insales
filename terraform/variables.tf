@@ -25,10 +25,6 @@ variable "machine_type" {
   description = "Standart machine type"
   default     = "n1-standard-1"
 }
-variable "mongo_default_port" {
-  description = "MongoDB default port"
-  default     = ["27017"]
-}
 variable "source_ranges" {
   description = "IP Source range"
 }

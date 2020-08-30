@@ -3,10 +3,10 @@ provider "google" {
   region  = var.region
 }
 
-// Mongo Instances
+// MongoDB Instances
 resource "google_compute_instance" "mongo" {
   count        = 3
-  name         = "mongo-${count.index + 1}"
+  name         = "mongo-test${count.index + 1}"
   machine_type = var.machine_type
   zone         = var.zone
   tags         = ["mongo"]
@@ -32,16 +32,6 @@ resource "google_compute_instance" "mongo" {
 }
 
 // Firewall rules
-resource "google_compute_firewall" "firewall_mongo" {
-  name    = "allow-mongo-default"
-  network = "default"
-  allow {
-    protocol = "tcp"
-    ports    = var.mongo_default_port
-  }
-  target_tags = ["mongo"]
-  source_tags = ["mongo"]
-}
 resource "google_compute_firewall" "firewall_ssh" {
   name    = "default-allow-ssh"
   network = "default"
@@ -50,4 +40,45 @@ resource "google_compute_firewall" "firewall_ssh" {
     ports    = ["22"]
   }
   source_ranges = [var.source_ranges]
+}
+
+// Generate ansible hosts file
+resource "null_resource" "ansible-provision" {
+  depends_on = ["google_compute_instance.mongo[0]", "google_compute_instance.mongo[1]", "google_compute_instance.mongo[2]"]
+
+  provisioner "local-exec" {
+    command = "echo [mongo_master] > hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${google_compute_instance.mongo[0].name} ansible_host=${google_compute_instance.mongo[0].network_interface.0.access_config.0.nat_ip}' >> hosts"
+  }
+
+   provisioner "local-exec" {
+    command = "echo [mongo_replicas] >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${google_compute_instance.mongo[1].name} ansible_host=${google_compute_instance.mongo[1].network_interface.0.access_config.0.nat_ip}' >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo '${google_compute_instance.mongo[2].name} ansible_host=${google_compute_instance.mongo[2].network_interface.0.access_config.0.nat_ip}' >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo [mongo:children] >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo mongo_master >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "echo mongo_replicas >> hosts"
+  }
+
+  provisioner "local-exec" {
+    command = "cp hosts ../ansible"
+  }
 }
